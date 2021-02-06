@@ -6,7 +6,7 @@ Specifically, this program compares the outputs of two supplied methods.
 
 === Server
 
-Run `./gradlew run`
+Run `./gradlew run`.
 
 === Client
 
