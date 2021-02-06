@@ -1,0 +1,13 @@
+== JRunner5
+
+This is a program that allows you to send Java to a server which will compile it for you.
+
+Specifically, this program compares the outputs of two supplied methods.
+
+=== Server
+
+Run `./gradlew run`
+
+=== Client
+
+See `python/jrunner5.py` for an example of how to use the client.
