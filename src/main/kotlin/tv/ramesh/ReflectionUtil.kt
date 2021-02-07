@@ -1,7 +1,8 @@
 package tv.ramesh;
-import org.joor.Reflect;
+import org.joor.Reflect
 import java.lang.reflect.ReflectPermission
 import java.security.Permission
+import org.apache.commons.lang3.exception.ExceptionUtils
 
 
 class ReflectionUtil {
@@ -43,7 +44,25 @@ public class JavaWrappedClass {
         val ref = Reflect.compile("sandboxed.JavaWrappedClass", java).create();
         val classInst: Any = ref.get()
 
-        return classInst.javaClass.getMethod("runProblem").invoke(classInst) as tv.ramesh.Response;
+        try {
+            return classInst.javaClass.getMethod("runProblem").invoke(classInst) as Response;
+        }
+        catch (e: Exception) {
+            var cause = ExceptionUtils.getRootCause(e)
+
+            val iValues: ArrayList<String> = arrayListOf();
+            var oValues: ArrayList<String> = arrayListOf();
+
+            val falseMatches: ArrayList<Boolean> = arrayListOf();
+            for (arg in functionArgs) {
+                iValues.add("$cause")
+                oValues.add("Input method caused an exception");
+
+                falseMatches.add(false)
+            }
+            e.printStackTrace()
+            return Response(iValues, oValues, falseMatches)
+        }
 
     }
 }

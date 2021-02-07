@@ -17,7 +17,7 @@ repositories {
 dependencies {
     implementation("org.jooq:joor:0.9.13")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.0.1")
-    implementation("commons-io:commons-io:2.8.0")
+    implementation("org.apache.commons:commons-lang3:3.11")
 }
 
 

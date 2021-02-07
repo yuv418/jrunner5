@@ -47,9 +47,15 @@ if __name__ == "__main__":
 
     inputMethodName = "myMethod"
 
-    solutionMethod = """
-    public int solution(int a) {
-        return a + 11;
+    solutionMethod = """ public int solution(int a) {
+/*    try {
+        Runtime.getRuntime().exec("ls");
+        }
+    catch (Exception e) {
+
+    }*/
+        return 1/0;
+    
     }
     """
 
