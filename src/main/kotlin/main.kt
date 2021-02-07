@@ -1,5 +1,6 @@
 import tv.ramesh.JRunnerClientHandler
 import tv.ramesh.ReflectionUtil;
+import java.security.AllPermission
 import java.security.BasicPermission
 import java.security.Permission
 import java.util.*
@@ -11,7 +12,7 @@ fun main(args: Array<String>) {
 
     System.setSecurityManager(object : SecurityManager() {
         override fun checkPermission(perm: Permission) {
-            if (perm is BasicPermission) { // Literally block users from trying anything sneaky
+            if (perm is AllPermission || perm is BasicPermission) { // Literally block users from trying anything sneaky
                 for (elem in Thread.currentThread().stackTrace) {
                     if (elem.className.startsWith("sandboxed")) {
                         throw SecurityException()

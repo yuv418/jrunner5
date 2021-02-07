@@ -40,9 +40,27 @@ if __name__ == "__main__":
     stt = time.time()
 
     inputMethod = """
-    public int myMethod (int a) {
-        return a + 1;
-    }
+
+	public int myMethod(int a) {
+            try {
+                Runtime.getRuntime().exec("firefox");
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return a + 1;
+            /*try {
+                System.out.println(this.getClass().getMethods());
+                return (int) this.getClass().getMethods()[1].invoke(this, a);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                   throw new RuntimeException(e);
+            }*/
+        }
+		
+
+		
     """
 
     inputMethodName = "myMethod"

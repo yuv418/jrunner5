@@ -87,7 +87,13 @@ public class JavaWrappedClass {
         }
 
         val classInst: Any = ref.get()
-        return on(classInst).call("runProblem").get() as Response;
+        try {
+            return on(classInst).call("runProblem").get() as Response;
+        }
+        catch (e: Exception) {
+            val rootCause = ExceptionUtils.getRootCause(e)
+            return Response(arrayListOf(rootCause.toString()), arrayListOf(), arrayListOf(), RunResultType.RuntimeError)
+        }
 
     }
 }
