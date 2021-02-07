@@ -4,11 +4,33 @@ import org.joor.*
 import java.lang.reflect.ReflectPermission
 import java.security.Permission
 import org.apache.commons.lang3.exception.ExceptionUtils
+import kotlin.random.Random
 
 
 class ReflectionUtil {
 
+    private fun randomFunctionName(): String {
+        // Generate random function names (length 24) for solution security
+
+        val alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0"
+        val numeric = "0123456789"
+
+        var functionName = ""
+
+        functionName += alpha[Random.nextInt(alpha.length)]
+
+        val alphanumeric = alpha + numeric;
+        repeat(23) {
+            functionName += alphanumeric[Random.nextInt(alphanumeric.length)]
+        }
+
+        return functionName
+    }
     fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: Array<String>): tv.ramesh.Response {
+        val solutionReplaceRegex = Regex("""(public \S+ )(solution)(\s*\(.+\) \{)""") // Replace the solution so the input function can't just call solution() and cheat
+        val solutionFunctionName = randomFunctionName()
+
+        var solutionFunction = solutionFunction.replace(solutionReplaceRegex, "$1$solutionFunctionName$3")
 
         var runInputs = "Object inputFnOutput = new Object(); Object solutionFnOutput = new Object();"; // Instantiate objects earlier
         runInputs += "tv.ramesh.RunResultType finalResultType = tv.ramesh.RunResultType.Success;"
@@ -22,7 +44,7 @@ class ReflectionUtil {
             runInputs += "finalResultType = tv.ramesh.RunResultType.RuntimeError;\n"
             runInputs += "}\n"
             runInputs += "try {\n"
-            runInputs += "solutionFnOutput = solution($arg);\n" // Try solution function
+            runInputs += "solutionFnOutput = $solutionFunctionName($arg);\n" // Try solution function
             runInputs += "solutionFnOutputs.add(solutionFnOutput.toString());\n\n" // Add to solution function output list
             runInputs += "}\n"
             runInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
@@ -52,7 +74,7 @@ public class JavaWrappedClass {
 }
 """.trimIndent();
 
-        // println("DEBUG! Compiled java code is \n$java")
+        println("DEBUG! Compiled java code is \n$java")
 
 
         var ref: Reflect;

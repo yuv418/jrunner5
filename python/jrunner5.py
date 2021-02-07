@@ -40,14 +40,14 @@ if __name__ == "__main__":
     stt = time.time()
 
     inputMethod = """
-    public int myMethod(int a) {
+    public int myMethod (int a) {
         return a + 1;
     }
     """
 
     inputMethodName = "myMethod"
 
-    solutionMethod = """ public int solution(int a) {
+    solutionMethod = """ public int solution (int a) {
 /*    try {
         Runtime.getRuntime().exec("ls");
         }
