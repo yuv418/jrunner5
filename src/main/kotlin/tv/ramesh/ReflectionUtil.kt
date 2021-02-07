@@ -30,7 +30,7 @@ public class JavaWrappedClass {
         $runInputs
 
 
-        return new tv.ramesh.Response(inputFnOutputs, solutionFnOutputs, matches);
+        return new tv.ramesh.Response(solutionFnOutputs, inputFnOutputs, matches);
     }
     $inputFunction
     $solutionFunction
