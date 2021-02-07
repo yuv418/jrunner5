@@ -13,7 +13,7 @@ class ReflectionUtil {
     private fun randomFunctionName(): String {
         // Generate random function names (length 24) for solution security
 
-        val alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0"
+        val alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         val numeric = "0123456789"
 
         var functionName = ""

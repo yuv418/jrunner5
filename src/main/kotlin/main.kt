@@ -2,6 +2,7 @@ import tv.ramesh.JRunnerClientHandler
 import tv.ramesh.ReflectionUtil;
 import java.security.AllPermission
 import java.security.BasicPermission
+import java.lang.RuntimePermission
 import java.security.Permission
 import java.util.*
 import java.net.*
