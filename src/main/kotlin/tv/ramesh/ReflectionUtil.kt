@@ -1,6 +1,7 @@
 package tv.ramesh;
 
 import org.joor.*
+import org.joor.Reflect.*
 import java.lang.reflect.ReflectPermission
 import java.security.Permission
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -74,7 +75,7 @@ public class JavaWrappedClass {
 }
 """.trimIndent();
 
-        println("DEBUG! Compiled java code is \n$java")
+        // println("DEBUG! Compiled java code is \n$java")
 
 
         var ref: Reflect;
@@ -86,7 +87,7 @@ public class JavaWrappedClass {
         }
 
         val classInst: Any = ref.get()
-        return classInst.javaClass.getMethod("runProblem").invoke(classInst) as Response;
+        return on(classInst).call("runProblem").get() as Response;
 
     }
 }
