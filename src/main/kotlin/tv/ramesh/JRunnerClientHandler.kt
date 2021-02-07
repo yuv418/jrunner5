@@ -7,12 +7,15 @@ import java.util.Arrays
 import kotlinx.serialization.*;
 import kotlinx.serialization.protobuf.*;
 
+enum class RunResultType {
+    RuntimeError, CompilerError, Success
+}
 
 @Serializable
 data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: Array<String>) // Reflect the inputs into the input types
 
 @Serializable
-data class Response(val solutionOutputs: ArrayList<String>, val methodOutputs: ArrayList<String>, val equalityOutputs: ArrayList<Boolean>)
+data class Response(val solutionOutputs: ArrayList<String>, val methodOutputs: ArrayList<String>, val equalityOutputs: ArrayList<Boolean>, val resultType: RunResultType)
 
 class JRunnerClientHandler() {
     private val reflector: ReflectionUtil = ReflectionUtil()

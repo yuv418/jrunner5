@@ -54,7 +54,8 @@ if __name__ == "__main__":
     catch (Exception e) {
 
     }*/
-        return 1/0;
+        return a + 1;
+
     
     }
     """

@@ -11,4 +11,13 @@ message Response {
     repeated string solutionOutputs = 1;
     repeated string methodOutputs = 2;
     repeated bool equalityOutputs = 3;
+    
+    enum RunResultType {
+	RuntimeError = 0;
+	CompilerError = 1;
+	Success = 2;
+    }
+
+    required RunResultType resultType = 4;
+
 }

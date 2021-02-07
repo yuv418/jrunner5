@@ -1,5 +1,6 @@
 package tv.ramesh;
-import org.joor.Reflect
+
+import org.joor.*
 import java.lang.reflect.ReflectPermission
 import java.security.Permission
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -31,7 +32,7 @@ public class JavaWrappedClass {
         $runInputs
 
 
-        return new tv.ramesh.Response(solutionFnOutputs, inputFnOutputs, matches);
+        return new tv.ramesh.Response(solutionFnOutputs, inputFnOutputs, matches, tv.ramesh.RunResultType.Success);
     }
     $inputFunction
     $solutionFunction
@@ -41,7 +42,13 @@ public class JavaWrappedClass {
         // println("DEBUG! Compiled java code is \n$java")
 
 
-        val ref = Reflect.compile("sandboxed.JavaWrappedClass", java).create();
+        var ref: Reflect;
+        try {
+            ref = Reflect.compile("sandboxed.JavaWrappedClass", java).create();
+        }
+        catch (e: ReflectException) {
+            return Response(arrayListOf(e.toString()), arrayListOf(), arrayListOf(), RunResultType.CompilerError)
+        }
         val classInst: Any = ref.get()
 
         try {
@@ -50,18 +57,7 @@ public class JavaWrappedClass {
         catch (e: Exception) {
             var cause = ExceptionUtils.getRootCause(e)
 
-            val iValues: ArrayList<String> = arrayListOf();
-            var oValues: ArrayList<String> = arrayListOf();
-
-            val falseMatches: ArrayList<Boolean> = arrayListOf();
-            for (arg in functionArgs) {
-                iValues.add("$cause")
-                oValues.add("Input method caused an exception");
-
-                falseMatches.add(false)
-            }
-            e.printStackTrace()
-            return Response(iValues, oValues, falseMatches)
+            return Response(arrayListOf(cause.toString()), arrayListOf(), arrayListOf(), RunResultType.RuntimeError)
         }
 
     }

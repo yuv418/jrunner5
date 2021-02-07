@@ -19,10 +19,40 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0creqres.proto\"_\n\x07Request\x12\x13\n\x0binputMethod\x18\x01 \x02(\t\x12\x17\n\x0finputMethodName\x18\x02 \x02(\t\x12\x16\n\x0esolutionMethod\x18\x03 \x02(\t\x12\x0e\n\x06inputs\x18\x04 \x03(\t\"S\n\x08Response\x12\x17\n\x0fsolutionOutputs\x18\x01 \x03(\t\x12\x15\n\rmethodOutputs\x18\x02 \x03(\t\x12\x17\n\x0f\x65qualityOutputs\x18\x03 \x03(\x08'
+  serialized_pb=b'\n\x0creqres.proto\"_\n\x07Request\x12\x13\n\x0binputMethod\x18\x01 \x02(\t\x12\x17\n\x0finputMethodName\x18\x02 \x02(\t\x12\x16\n\x0esolutionMethod\x18\x03 \x02(\t\x12\x0e\n\x06inputs\x18\x04 \x03(\t\"\xc3\x01\n\x08Response\x12\x17\n\x0fsolutionOutputs\x18\x01 \x03(\t\x12\x15\n\rmethodOutputs\x18\x02 \x03(\t\x12\x17\n\x0f\x65qualityOutputs\x18\x03 \x03(\x08\x12+\n\nresultType\x18\x04 \x02(\x0e\x32\x17.Response.RunResultType\"A\n\rRunResultType\x12\x10\n\x0cRuntimeError\x10\x00\x12\x11\n\rCompilerError\x10\x01\x12\x0b\n\x07Success\x10\x02'
 )
 
 
+
+_RESPONSE_RUNRESULTTYPE = _descriptor.EnumDescriptor(
+  name='RunResultType',
+  full_name='Response.RunResultType',
+  filename=None,
+  file=DESCRIPTOR,
+  create_key=_descriptor._internal_create_key,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='RuntimeError', index=0, number=0,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='CompilerError', index=1, number=1,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='Success', index=2, number=2,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=244,
+  serialized_end=309,
+)
+_sym_db.RegisterEnumDescriptor(_RESPONSE_RUNRESULTTYPE)
 
 
 _REQUEST = _descriptor.Descriptor(
@@ -107,11 +137,19 @@ _RESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='resultType', full_name='Response.resultType', index=3,
+      number=4, type=14, cpp_type=8, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
+    _RESPONSE_RUNRESULTTYPE,
   ],
   serialized_options=None,
   is_extendable=False,
@@ -119,10 +157,12 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=113,
-  serialized_end=196,
+  serialized_start=114,
+  serialized_end=309,
 )
 
+_RESPONSE.fields_by_name['resultType'].enum_type = _RESPONSE_RUNRESULTTYPE
+_RESPONSE_RUNRESULTTYPE.containing_type = _RESPONSE
 DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
