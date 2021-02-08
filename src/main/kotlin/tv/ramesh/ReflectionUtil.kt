@@ -91,10 +91,21 @@ public class JavaWrappedClass {
 
 """
 
-        val problemJava = sharedJava + "$runInputs $inputFunction}"
+        val problemJava = sharedJava + """
+        $runInputs
+
+        $inputFunction
+
+}"""
         // println(problemJava)
 
-        val solutionJava = sharedJava + "$runSolutionInputs $solutionFunction}"
+        val solutionJava = sharedJava + """
+
+        $runSolutionInputs
+
+        $solutionFunction
+
+    }"""
 
         // println("DEBUG! Compiled java code is \n$java")
 

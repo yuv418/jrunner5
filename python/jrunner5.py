@@ -41,10 +41,14 @@ if __name__ == "__main__":
 
     inputMethod = """
 
-public int myMethod(int a) {
-  return a + 1;
-
+int b = 6;
+java.util.ArrayList<Double> ret = new java.util.ArrayList<Double>();
+public java.util.ArrayList<Double> myMethod(double a) {
+ if(a<1) return ret;
+ ret.add(a);
+ return myMethod(a/1.05);
 }
+
 
 		
     """
@@ -57,7 +61,7 @@ public int myMethod(int a) {
      }
     """
 
-    response = client.send_java(inputMethod, inputMethodName, solutionMethod, [str(i) for i in range(5)])
+    response = client.send_java(inputMethod, inputMethodName, solutionMethod, [str(i) for i in range(5, 15)])
 
     print(f"Server returned response\n{response}")
     print(f"TIME {time.time() - stt} seconds")
