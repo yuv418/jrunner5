@@ -40,22 +40,24 @@ if __name__ == "__main__":
     stt = time.time()
 
     inputMethod = """
+private int b = 6;
+public java.util.ArrayList<Double> ret = new java.util.ArrayList<Double>();
 
-	public int myMethod(int a) {
-            return a / 0;
-        }
-		
+public java.util.ArrayList<Double> myMethod(double a) {
+ if(a<1) return ret;
+ ret.add(a);
+ return myMethod(a/1.05);
+}
 
 		
     """
 
     inputMethodName = "myMethod"
 
-    solutionMethod = """ public int solution (int a) {
+    solutionMethod = """
+    public int solution (int a) {
         return a + 1;
-
-    
-    }
+     }
     """
 
     response = client.send_java(inputMethod, inputMethodName, solutionMethod, [str(i) for i in range(5)])
