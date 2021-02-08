@@ -38,10 +38,10 @@ class ReflectionUtil {
 
         // runInputs += "tv.ramesh.RunResultType finalResultType = tv.ramesh.RunResultType.Success;"
         for ((arg, i) in functionArgs.withIndex()) {
-            runInputs += "public Object runProblemInput$i() {"
+            runInputs += "public Object runProblemInput$arg() {"
             runInputs += "Object inputFnOutput = new Object();"
             runInputs += "try {\n"
-            runInputs += "inputFnOutput = $inputFunctionName($arg);\n" // Try user input function
+            runInputs += "inputFnOutput = $inputFunctionName($i);\n" // Try user input function
             runInputs += "inputFnOutputs.add(inputFnOutput.toString());\n" // Add to input function output list
             runInputs += "}\n"
             runInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
@@ -53,10 +53,10 @@ class ReflectionUtil {
             runInputs += "}"
 
             // Solution outputs
-            runSolutionInputs += "public Object runProblemInput$i() {"
+            runSolutionInputs += "public Object runProblemInput$arg() {"
             runSolutionInputs += "Object solutionFnOutput = new Object();"
             runSolutionInputs += "try {\n"
-            runSolutionInputs += "solutionFnOutput = solution($arg);\n" // Try solution function
+            runSolutionInputs += "solutionFnOutput = solution($i);\n" // Try solution function
             runSolutionInputs += "inputFnOutputs.add(solutionFnOutput.toString());\n\n" // Add to solution function output list
             runSolutionInputs += "}\n"
             runSolutionInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
@@ -132,7 +132,7 @@ public class JavaWrappedClass {
             runResultType = RunResultType.RuntimeError
         }
 
-        return Response(problemOut.third, solutionOut.third, matches, runResultType)
+        return Response(solutionOut.third, problemOut.third, matches, runResultType)
 
     }
 
