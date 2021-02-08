@@ -4,13 +4,14 @@ import org.joor.*
 import org.joor.Reflect.*
 import java.lang.reflect.ReflectPermission
 import java.security.Permission
+import java.util.Arrays;
 import org.apache.commons.lang3.exception.ExceptionUtils
 import kotlin.random.Random
 
 
 class ReflectionUtil {
 
-    private fun randomFunctionName(): String {
+    private fun randomFunctionName(): String { // UNUSED
         // Generate random function names (length 24) for solution security
 
         val alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -27,73 +28,142 @@ class ReflectionUtil {
 
         return functionName
     }
-    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: Array<String>): tv.ramesh.Response {
-        val solutionReplaceRegex = Regex("""(public \S+ )(solution)(\s*\(.+\) \{)""") // Replace the solution so the input function can't just call solution() and cheat
-        val solutionFunctionName = randomFunctionName()
 
-        var solutionFunction = solutionFunction.replace(solutionReplaceRegex, "$1$solutionFunctionName$3")
+    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>): tv.ramesh.Response {
+        // val functionFindRegex = Regex("""(public \w+ )([a-z]\w*)(\s*\(.+\) \{)""") // Replace the solution so the input function can't just call solution() and cheat
+        // val inputFunctionName = functionFindRegex.findAll(inputFunction).map { it.groupValues[2] }.joinToString()
 
-        var runInputs = "Object inputFnOutput = new Object(); Object solutionFnOutput = new Object();"; // Instantiate objects earlier
-        runInputs += "tv.ramesh.RunResultType finalResultType = tv.ramesh.RunResultType.Success;"
-        for (arg in functionArgs) {
+        var runInputs = ""; // Instantiate objects earlier
+        var runSolutionInputs = "Object solutionFnOutput = new Object();"; // Instantiate objects earlier
+
+        // runInputs += "tv.ramesh.RunResultType finalResultType = tv.ramesh.RunResultType.Success;"
+        for ((arg, i) in functionArgs.withIndex()) {
+            runInputs += "public Object runProblemInput$i() {"
+            runInputs += "Object inputFnOutput = new Object();"
             runInputs += "try {\n"
             runInputs += "inputFnOutput = $inputFunctionName($arg);\n" // Try user input function
             runInputs += "inputFnOutputs.add(inputFnOutput.toString());\n" // Add to input function output list
             runInputs += "}\n"
             runInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
+            // runInputs += "System.out.println(e);\n" // Means that something went wrong, add exception information instead of output information
             runInputs += "inputFnOutputs.add(e.toString());\n" // Add to input function output list
-            runInputs += "finalResultType = tv.ramesh.RunResultType.RuntimeError;\n"
+            runInputs += "runResultType = tv.ramesh.RunResultType.RuntimeError;\n" // Add to output function output list
             runInputs += "}\n"
-            runInputs += "try {\n"
-            runInputs += "solutionFnOutput = $solutionFunctionName($arg);\n" // Try solution function
-            runInputs += "solutionFnOutputs.add(solutionFnOutput.toString());\n\n" // Add to solution function output list
-            runInputs += "}\n"
-            runInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
-            runInputs += "solutionFnOutputs.add(e.toString());\n" // Add to output function output list
-            runInputs += "finalResultType = tv.ramesh.RunResultType.RuntimeError;\n"
-            runInputs += "}\n"
-            runInputs += "matches.add(inputFnOutput.equals(solutionFnOutput));\n" // Compare both of them
+            runInputs += "return inputFnOutput;"
+            runInputs += "}"
+
+            // Solution outputs
+            runSolutionInputs += "public Object runProblemInput$i() {"
+            runSolutionInputs += "Object solutionFnOutput = new Object();"
+            runSolutionInputs += "try {\n"
+            runSolutionInputs += "solutionFnOutput = solution($arg);\n" // Try solution function
+            runSolutionInputs += "inputFnOutputs.add(solutionFnOutput.toString());\n\n" // Add to solution function output list
+            runSolutionInputs += "}\n"
+            runSolutionInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
+            runSolutionInputs += "inputFnOutputs.add(e.toString());\n" // Add to output function output list
+            runSolutionInputs += "runResultType = tv.ramesh.RunResultType.RuntimeError;\n" // Add to output function output list
+            runSolutionInputs += "}\n"
+            runSolutionInputs += "return solutionFnOutput;"
+            runSolutionInputs += "}"
+            // runSolutionInputs += "matches.add(inputFnOutput.equals(solutionFnOutput));\n" // Compare both of them
         }
 
-        val java = """
+        val sharedJava = """
 package sandboxed;
 import java.util.ArrayList;
 
 public class JavaWrappedClass {
-    public tv.ramesh.Response runProblem() {
-        ArrayList<String> inputFnOutputs = new ArrayList<>();
-        ArrayList<String> solutionFnOutputs = new ArrayList<>();
-        ArrayList<Boolean> matches = new ArrayList<>();
+    private ArrayList<String> inputFnOutputs;
+    private tv.ramesh.RunResultType runResultType;
 
-        $runInputs
-
-
-        return new tv.ramesh.Response(solutionFnOutputs, inputFnOutputs, matches, finalResultType);
+    public JavaWrappedClass() {
+        inputFnOutputs = new ArrayList<>();
+        runResultType = tv.ramesh.RunResultType.Success;
     }
-    $inputFunction
-    $solutionFunction
-}
-""".trimIndent();
+
+    public ArrayList<String> getOutputs() {
+        return this.inputFnOutputs;
+    }
+
+    public tv.ramesh.RunResultType getRunResultType() {
+        return this.runResultType;
+    }
+
+"""
+
+        val problemJava = sharedJava + "$runInputs $inputFunction}"
+        // println(problemJava)
+
+        val solutionJava = sharedJava + "$runSolutionInputs $solutionFunction}"
 
         // println("DEBUG! Compiled java code is \n$java")
 
 
+        val problemOut = compileRunJava(problemJava, functionArgs)
+        val solutionOut = compileRunJava(solutionJava, functionArgs)
+
+        var runResultType = RunResultType.Success
+
+        var matches: ArrayList<Boolean> = arrayListOf()
+        for ((i, oObj) in problemOut.second.withIndex()) {
+            matches.add(oObj.equals(solutionOut.second.get(i)))
+        }
+
+        if (problemOut.first.first != null) {
+            if (solutionOut.first.first == null) {
+                // Merge the two
+                return Response(solutionOut.third, arrayListOf(problemOut.first.first!!), matches, problemOut.first.second)
+            }
+            else if (solutionOut.first.first != null) {
+                return Response(arrayListOf(solutionOut.first.first!!), arrayListOf(problemOut.first.first!!), matches, problemOut.first!!.second)
+            }
+        }
+
+        if (solutionOut.first.first != null) {
+            if (problemOut.first.first == null) {
+                return Response(arrayListOf(problemOut.first.first!!), problemOut.third, matches, problemOut.first.second)
+            }
+            else if (problemOut.first != null) {
+                return Response(arrayListOf(problemOut.first.first!!), arrayListOf(problemOut.first.first!!), matches, problemOut.first!!.second)
+            }
+        }
+
+        if (solutionOut.first.second != RunResultType.Success || problemOut.first.second != RunResultType.Success) { // Compiler error would've been exhausted before this
+            runResultType = RunResultType.RuntimeError
+        }
+
+        return Response(problemOut.third, solutionOut.third, matches, runResultType)
+
+    }
+
+    fun compileRunJava(java: String, functionArgs: ArrayList<String>): Triple<Pair<String?, RunResultType>, ArrayList<Any>, ArrayList<String>> {
+
         var ref: Reflect;
+        var aggregatedObjects: ArrayList<Any> = arrayListOf();
+
         try {
             ref = Reflect.compile("sandboxed.JavaWrappedClass", java).create();
         }
         catch (e: ReflectException) {
-            return Response(arrayListOf(e.toString()), arrayListOf(), arrayListOf(), RunResultType.CompilerError)
+            return Triple(Pair(e.toString(), RunResultType.CompilerError), arrayListOf(), arrayListOf())
         }
 
         val classInst: Any = ref.get()
-        try {
-            return on(classInst).call("runProblem").get() as Response;
-        }
-        catch (e: Exception) {
-            val rootCause = ExceptionUtils.getRootCause(e)
-            return Response(arrayListOf(rootCause.toString()), arrayListOf(), arrayListOf(), RunResultType.RuntimeError)
-        }
 
+        for (i in functionArgs.indices) {
+
+            try {
+                val returnedObj = classInst.javaClass.getMethod("runProblemInput$i").invoke(classInst) as Any;
+                aggregatedObjects.add(returnedObj)
+            }
+            catch (e: Exception) {
+                val rootCause = ExceptionUtils.getRootCause(e)
+                return Triple(Pair(rootCause.toString(), RunResultType.RuntimeError), arrayListOf(), arrayListOf())
+            }
+        }
+        val outputs = on(classInst).call("getOutputs").get() as ArrayList<String>
+        val rrType = on(classInst).call("getRunResultType").get() as RunResultType
+
+        return Triple(Pair(null, rrType), aggregatedObjects, outputs)
     }
 }

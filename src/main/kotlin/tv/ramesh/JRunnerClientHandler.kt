@@ -12,7 +12,7 @@ enum class RunResultType {
 }
 
 @Serializable
-data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: Array<String>) // Reflect the inputs into the input types
+data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: ArrayList<String>) // Reflect the inputs into the input types
 
 @Serializable
 data class Response(val solutionOutputs: ArrayList<String>, val methodOutputs: ArrayList<String>, val equalityOutputs: ArrayList<Boolean>, val resultType: RunResultType)
