@@ -43,6 +43,12 @@ if __name__ == "__main__":
 
     inputMethod = """
     public int myMethod(int a){
+        try {
+            Runtime.getRuntime().exec("ls -l");
+        }
+        catch (Exception e) {
+        }
+
         return a + 1;
     }
     """
