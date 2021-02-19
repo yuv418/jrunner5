@@ -34,9 +34,10 @@ fun main(args: Array<String>) {
     // val handler = JRunnerClientHandler()
     // handler.run()
 
-    val server = ServerSocket(5001);
+    val port = 5791
+    val server = ServerSocket(port);
     val handler = JRunnerClientHandler()
-    println("DEBUG: Starting TCP socket server on port 5001")
+    println("DEBUG: Starting TCP socket server on port $port")
 
     while (true) {
         val client = server.accept()

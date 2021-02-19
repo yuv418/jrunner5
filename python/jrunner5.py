@@ -3,6 +3,7 @@ import socket
 import select
 import time
 
+TIMEOUT = 15
 
 class JRunner5Client():
     def __init__(self, client_ip, client_port):
@@ -21,11 +22,12 @@ class JRunner5Client():
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setblocking(True)
+        s.settimeout(TIMEOUT)
         s.connect((self.client_ip, self.client_port))
         s.sendall(req_bytes)
 
         # Receive
-        data = s.recv(4096)
+        data = s.recv(16192)
 
         response = reqres_pb2.Response()
         response.ParseFromString(data)
@@ -36,32 +38,24 @@ class JRunner5Client():
 # Test things
 
 if __name__ == "__main__":
-    client = JRunner5Client("127.0.0.1", 5001)
+    client = JRunner5Client("127.0.0.1", 5791)
     stt = time.time()
 
     inputMethod = """
-
-int b = 6;
-java.util.ArrayList<Double> ret = new java.util.ArrayList<Double>();
-public java.util.ArrayList<Double> myMethod(double a) {
- if(a<1) return ret;
- ret.add(a);
- return myMethod(a/1.05);
-}
-
-
-		
+    public int myMethod(int a){
+        return a + 1;
+    }
     """
 
     inputMethodName = "myMethod"
 
     solutionMethod = """
-    public int solution (int a) {
-        return a + 11;
+    public int solution(int a) {
+        return a + 1;
      }
     """
 
-    response = client.send_java(inputMethod, inputMethodName, solutionMethod, [str(i) for i in range(5, 15)])
+    response = client.send_java(inputMethod, inputMethodName, solutionMethod, ["1", "2"])
 
     print(f"Server returned response\n{response}")
     print(f"TIME {time.time() - stt} seconds")

@@ -11,6 +11,9 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://jitpack.io")
+    }
 }
 
 
@@ -18,6 +21,7 @@ dependencies {
     implementation("org.jooq:joor:0.9.13")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.0.1")
     implementation("org.apache.commons:commons-lang3:3.11")
+    implementation("com.github.adelnizamutdinov:kotlin-either:3.0.0")
 }
 
 

@@ -6,8 +6,9 @@ import java.lang.reflect.ReflectPermission
 import java.security.Permission
 import java.util.Arrays;
 import org.apache.commons.lang3.exception.ExceptionUtils
+import org.apache.commons.lang3.tuple.Triple as JavaTriple
+import either.Either;
 import kotlin.random.Random
-
 
 class ReflectionUtil {
 
@@ -29,65 +30,60 @@ class ReflectionUtil {
         return functionName
     }
 
-    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>): tv.ramesh.Response {
+    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>?): tv.ramesh.Response {
         // val functionFindRegex = Regex("""(public \w+ )([a-z]\w*)(\s*\(.+\) \{)""") // Replace the solution so the input function can't just call solution() and cheat
         // val inputFunctionName = functionFindRegex.findAll(inputFunction).map { it.groupValues[2] }.joinToString()
+
+        var functionArgs = functionArgs;
+
+        if (functionArgs == null) {
+            functionArgs = arrayListOf();
+        }
+
 
         var runInputs = ""; // Instantiate objects earlier
         var runSolutionInputs = "Object solutionFnOutput = new Object();"; // Instantiate objects earlier
 
         // runInputs += "tv.ramesh.RunResultType finalResultType = tv.ramesh.RunResultType.Success;"
-        for ((i, arg) in functionArgs.withIndex()) {
-            runInputs += "public Object runProblemInput$i() {"
-            runInputs += "Object inputFnOutput = new Object();"
-            runInputs += "try {\n"
-            runInputs += "inputFnOutput = $inputFunctionName($arg);\n" // Try user input function
-            runInputs += "inputFnOutputs.add(inputFnOutput.toString());\n" // Add to input function output list
-            runInputs += "}\n"
-            runInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
-            // runInputs += "System.out.println(e);\n" // Means that something went wrong, add exception information instead of output information
-            runInputs += "inputFnOutputs.add(e.toString());\n" // Add to input function output list
-            runInputs += "runResultType = tv.ramesh.RunResultType.RuntimeError;\n" // Add to output function output list
-            runInputs += "}\n"
-            runInputs += "return inputFnOutput;"
-            runInputs += "}"
+        val runCode = { index: Int, functionName: String, arg: String -> """
+public Triple<Object, tv.ramesh.OutputResultType, String> runProblemInput$index() {
+    Object inputFnOutput = new Object();
+    String output = "";
+    tv.ramesh.OutputResultType runResultType = tv.ramesh.OutputResultType.Success;
+    try {
+        inputFnOutput = $functionName($arg);
+        output = inputFnOutput.toString();
+    }
+    catch (Exception e) {
+        output = e.toString();
+        runResultType = tv.ramesh.OutputResultType.RuntimeError;
+    }
 
-            // Solution outputs
-            runSolutionInputs += "public Object runProblemInput$i() {"
-            runSolutionInputs += "Object solutionFnOutput = new Object();"
-            runSolutionInputs += "try {\n"
-            runSolutionInputs += "solutionFnOutput = solution($arg);\n" // Try solution function
-            runSolutionInputs += "inputFnOutputs.add(solutionFnOutput.toString());\n\n" // Add to solution function output list
-            runSolutionInputs += "}\n"
-            runSolutionInputs += "catch (Exception e) {\n" // Means that something went wrong, add exception information instead of output information
-            runSolutionInputs += "inputFnOutputs.add(e.toString());\n" // Add to output function output list
-            runSolutionInputs += "runResultType = tv.ramesh.RunResultType.RuntimeError;\n" // Add to output function output list
-            runSolutionInputs += "}\n"
-            runSolutionInputs += "return solutionFnOutput;"
-            runSolutionInputs += "}"
-            // runSolutionInputs += "matches.add(inputFnOutput.equals(solutionFnOutput));\n" // Compare both of them
+    return Triple.of(inputFnOutput, runResultType, output);
+}
+""" }
+        for ((i, arg) in functionArgs.withIndex()) {
+            runInputs += runCode(i, inputFunctionName, arg)
+            runSolutionInputs += runCode(i, "solution", arg)
         }
+        // println(runInputs)
 
         val sharedJava = """
 package sandboxed;
 import java.util.ArrayList;
+import org.apache.commons.lang3.tuple.Triple;
 
 public class JavaWrappedClass {
     private ArrayList<String> inputFnOutputs;
-    private tv.ramesh.RunResultType runResultType;
 
     public JavaWrappedClass() {
         inputFnOutputs = new ArrayList<>();
-        runResultType = tv.ramesh.RunResultType.Success;
     }
 
     public ArrayList<String> getOutputs() {
         return this.inputFnOutputs;
     }
 
-    public tv.ramesh.RunResultType getRunResultType() {
-        return this.runResultType;
-    }
 
 """
 
@@ -114,67 +110,99 @@ public class JavaWrappedClass {
         val solutionOut = compileRunJava(solutionJava, functionArgs)
 
         var runResultType = RunResultType.Success
+        var outputs: ArrayList<Output> = arrayListOf()
 
-        var matches: ArrayList<Boolean> = arrayListOf()
-        for ((i, oObj) in problemOut.second.withIndex()) {
-            matches.add(oObj.equals(solutionOut.second.get(i)))
+        // TODO there are many possibilities here. We should make a method that composes the different types together
+        when (problemOut) {
+            is Either.Left -> {
+                runResultType = RunResultType.CompilerError
+                when (solutionOut) {
+                    is Either.Left -> { // both failed to compile
+                        outputs = arrayListOf(
+                            Output(solutionOut.value.first, OutputResultType.CompilerError, problemOut.value.first, OutputResultType.CompilerError, false)
+                        )
+                    }
+                    is Either.Right -> { // problem failed to compile, solution compiled
+                        outputs = arrayListOf(
+                            Output("", OutputResultType.Success, problemOut.value.first, OutputResultType.CompilerError, false)
+                        )
+                    }
+                }
+            }
+            is Either.Right -> {
+                println("thing " + problemOut.value.size)
+
+                if (problemOut.value.size > 0) {
+                    println("got here")
+                    for (i in 0..(problemOut.value.size - 1)) {
+                        val problemTriple = problemOut.value[i]
+                        when (solutionOut) {
+                            is Either.Right -> {
+                                val solnTriple = solutionOut.value[i]
+
+                                var tOutput = Output(solnTriple.third, solnTriple.second, problemTriple.third, problemTriple.second, problemTriple.first.equals(solnTriple.first))
+                                outputs.add(tOutput)
+                            }
+                            is Either.Left -> { // problem compiled, solution didn't compile
+                                outputs = arrayListOf(
+                                    Output(solutionOut.value.first, OutputResultType.CompilerError, problemTriple.third, problemTriple.second, false)
+                                )
+                                runResultType = RunResultType.CompilerError
+                            }
+                        }
+                    }
+                }
+                else { // Compiler check
+                    when (solutionOut) {
+                        is Either.Left -> { // input compiled, solution didn't
+                            outputs = arrayListOf(
+                                Output(solutionOut.value.first, OutputResultType.CompilerError, "", OutputResultType.Success, false)
+                            )
+                            runResultType = RunResultType.CompilerError
+                        }
+                        else -> {}
+                    }
+                }
+            }
         }
 
-        if (problemOut.first.first != null) {
-            if (solutionOut.first.first == null) {
-                // Merge the two
-                return Response(solutionOut.third, arrayListOf(problemOut.first.first!!), matches, problemOut.first.second)
-            }
-            else if (solutionOut.first.first != null) {
-                return Response(arrayListOf(solutionOut.first.first!!), arrayListOf(problemOut.first.first!!), matches, problemOut.first!!.second)
-            }
-        }
 
-        if (solutionOut.first.first != null) {
-            if (problemOut.first.first == null) {
-                return Response(arrayListOf(problemOut.first.first!!), problemOut.third, matches, problemOut.first.second)
-            }
-            else if (problemOut.first != null) {
-                return Response(arrayListOf(problemOut.first.first!!), arrayListOf(problemOut.first.first!!), matches, problemOut.first!!.second)
-            }
-        }
-
-        if (solutionOut.first.second != RunResultType.Success || problemOut.first.second != RunResultType.Success) { // Compiler error would've been exhausted before this
-            runResultType = RunResultType.RuntimeError
-        }
-
-        return Response(solutionOut.third, problemOut.third, matches, runResultType)
+        return Response(runResultType, outputs)
 
     }
 
-    fun compileRunJava(java: String, functionArgs: ArrayList<String>): Triple<Pair<String?, RunResultType>, ArrayList<Any>, ArrayList<String>> {
+    fun compileRunJava(java: String, functionArgs: ArrayList<String>): Either<Pair<String, RunResultType>, ArrayList<Triple<Any, OutputResultType, String>>> {
 
         var ref: Reflect;
-        var aggregatedObjects: ArrayList<Any> = arrayListOf();
+        var aggregatedObjects: ArrayList<Triple<Any, OutputResultType, String>> = arrayListOf();
 
         try {
             ref = Reflect.compile("sandboxed.JavaWrappedClass", java).create();
         }
         catch (e: ReflectException) {
-            return Triple(Pair(e.toString(), RunResultType.CompilerError), arrayListOf(), arrayListOf())
+            return Either.Left(Pair(e.toString(), RunResultType.CompilerError))
         }
+
 
         val classInst: Any = ref.get()
-
         for (i in functionArgs.indices) {
-
             try {
-                val returnedObj = classInst.javaClass.getMethod("runProblemInput$i").invoke(classInst) as Any;
-                aggregatedObjects.add(returnedObj)
+                val returnedObj: JavaTriple<Any, OutputResultType, String> = on(classInst).call("runProblemInput$i").get() as JavaTriple<Any, OutputResultType, String>
+                var outputResultType = OutputResultType.Success
+                aggregatedObjects.add(Triple(returnedObj.left!!, returnedObj.middle, returnedObj.right!!))
+
+                /*if (returnedObj.right.contains("Exception")) {
+                    outputResultType = OutputResultType.RuntimeError
+                }*/
             }
-            catch (e: Exception) {
-                val rootCause = ExceptionUtils.getRootCause(e)
-                return Triple(Pair(rootCause.toString(), RunResultType.RuntimeError), arrayListOf(), arrayListOf())
+            catch (se: Exception) {
+                val rootCause = ExceptionUtils.getRootCause(se)
+                // Always a SecurityException (hopefully!) if we land here; there is an error handler elsewhere
+                aggregatedObjects.add(Triple(Object(), OutputResultType.SecurityError, rootCause.toString()))
             }
         }
-        val outputs = on(classInst).call("getOutputs").get() as ArrayList<String>
-        val rrType = on(classInst).call("getRunResultType").get() as RunResultType
 
-        return Triple(Pair(null, rrType), aggregatedObjects, outputs)
+        return Either.Right(aggregatedObjects)
     }
+
 }

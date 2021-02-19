@@ -8,14 +8,21 @@ import kotlinx.serialization.*;
 import kotlinx.serialization.protobuf.*;
 
 enum class RunResultType {
-    RuntimeError, CompilerError, Success
+    Success, CompilerError
+}
+
+enum class OutputResultType {
+    Success, RuntimeError, SecurityError, CompilerError
 }
 
 @Serializable
-data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: ArrayList<String>) // Reflect the inputs into the input types
+data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: ArrayList<String> = arrayListOf()) // Reflect the inputs into the input types
 
 @Serializable
-data class Response(val solutionOutputs: ArrayList<String>, val methodOutputs: ArrayList<String>, val equalityOutputs: ArrayList<Boolean>, val resultType: RunResultType)
+data class Output(val solutionOutput: String, val solutionOutputType: OutputResultType, val methodOutput: String, val methodOutputType: OutputResultType, val match: Boolean)
+
+@Serializable
+data class Response(val resultType: RunResultType, val results: ArrayList<Output>)
 
 class JRunnerClientHandler() {
     private val reflector: ReflectionUtil = ReflectionUtil()
@@ -39,8 +46,10 @@ class JRunnerClientHandler() {
         )
 
         println("DEBUG: outputted answer is $ans")
+        val ansBytes = ProtoBuf.encodeToByteArray(ans)
+        println("DEBUG: ans size is ${ansBytes.size}")
 
-        writer.write(ProtoBuf.encodeToByteArray(ans)) // Send back data
+        writer.write(ansBytes) // Send back data
 
         writer.close()
         client.close()

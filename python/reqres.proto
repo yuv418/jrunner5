@@ -8,16 +8,31 @@ message Request {
 }
 
 message Response {
-    repeated string solutionOutputs = 1;
-    repeated string methodOutputs = 2;
-    repeated bool equalityOutputs = 3;
-    
+
     enum RunResultType {
-	RuntimeError = 0;
-	CompilerError = 1;
-	Success = 2;
+        Success = 0;
+        CompilerError = 1;
     }
 
-    required RunResultType resultType = 4;
+    required RunResultType overallResultType = 1;
+    repeated Output results = 2;
+
+}
+
+enum OutputResultType {
+    Success = 0;
+    RuntimeError = 1;
+    SecurityError = 2;
+    CompilerError = 3;
+}
+
+message Output {
+
+
+    required string solutionOutput = 1;
+    required OutputResultType solutionOutputType = 2;
+    required string methodOutput = 3;
+    required OutputResultType methodOutputType = 4;
+    required bool match = 5;
 
 }
