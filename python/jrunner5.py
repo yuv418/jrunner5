@@ -45,12 +45,7 @@ if __name__ == "__main__":
 
     inputMethod = """
     public int myMethod(int a){
-    if (a % 2 == 0) {
-
-        while (true) {
-        }
-    }
-    return a + 1;
+    return a / 0;
     }
     """
 

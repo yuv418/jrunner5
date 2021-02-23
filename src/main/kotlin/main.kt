@@ -23,17 +23,6 @@ fun main(args: Array<String>) {
         }
     })
 
-    val javaCode = """ // What if someone tries to import something? If they try importing jooR, they will literally get a SecurityException since reflection isn't allowed hehe
-    public int xvceller() throws java.io.IOException {
-        // Runtime.getRuntime().exec("firefox");
-        System.out.println("RUnninghere");
-        return 2;
-    }
-"""
-
-    // val handler = JRunnerClientHandler()
-    // handler.run()
-
     val port = 5791
     val server = ServerSocket(port);
     val handler = JRunnerClientHandler()
