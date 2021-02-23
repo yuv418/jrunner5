@@ -5,6 +5,7 @@ message Request {
     required string inputMethodName = 2;
     required string solutionMethod = 3;
     repeated string inputs = 4;
+    optional int64  timeout = 5;
 }
 
 message Response {
@@ -24,6 +25,7 @@ enum OutputResultType {
     RuntimeError = 1;
     SecurityError = 2;
     CompilerError = 3;
+    TimeoutError = 4;
 }
 
 message Output {

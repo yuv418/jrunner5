@@ -8,6 +8,11 @@ import java.util.Arrays;
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.apache.commons.lang3.tuple.Triple as JavaTriple
 import either.Either;
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import kotlin.random.Random
 
 class ReflectionUtil {
@@ -30,7 +35,7 @@ class ReflectionUtil {
         return functionName
     }
 
-    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>?): tv.ramesh.Response {
+    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>?, timeout: Long): tv.ramesh.Response {
         // val functionFindRegex = Regex("""(public \w+ )([a-z]\w*)(\s*\(.+\) \{)""") // Replace the solution so the input function can't just call solution() and cheat
         // val inputFunctionName = functionFindRegex.findAll(inputFunction).map { it.groupValues[2] }.joinToString()
 
@@ -106,8 +111,8 @@ public class JavaWrappedClass {
         // println("DEBUG! Compiled java code is \n$java")
 
 
-        val problemOut = compileRunJava(problemJava, functionArgs)
-        val solutionOut = compileRunJava(solutionJava, functionArgs)
+        val problemOut = compileRunJava(problemJava, functionArgs, timeout)
+        val solutionOut = compileRunJava(solutionJava, functionArgs, timeout)
 
         var runResultType = RunResultType.Success
         var outputs: ArrayList<Output> = arrayListOf()
@@ -171,7 +176,7 @@ public class JavaWrappedClass {
 
     }
 
-    fun compileRunJava(java: String, functionArgs: ArrayList<String>): Either<Pair<String, RunResultType>, ArrayList<Triple<Any, OutputResultType, String>>> {
+    fun compileRunJava(java: String, functionArgs: ArrayList<String>, timeout: Long): Either<Pair<String, RunResultType>, ArrayList<Triple<Any, OutputResultType, String>>> {
 
         var ref: Reflect;
         var aggregatedObjects: ArrayList<Triple<Any, OutputResultType, String>> = arrayListOf();
@@ -186,19 +191,32 @@ public class JavaWrappedClass {
 
         val classInst: Any = ref.get()
         for (i in functionArgs.indices) {
-            try {
-                val returnedObj: JavaTriple<Any, OutputResultType, String> = on(classInst).call("runProblemInput$i").get() as JavaTriple<Any, OutputResultType, String>
-                var outputResultType = OutputResultType.Success
-                aggregatedObjects.add(Triple(returnedObj.left!!, returnedObj.middle, returnedObj.right!!))
+            var sRun = Executors.newFixedThreadPool(1)
+            var future = sRun.submit(object: Runnable {
+                override fun run() {
+                    try {
+                        val returnedObj: JavaTriple<Any, OutputResultType, String> = on(classInst).call("runProblemInput$i").get() as JavaTriple<Any, OutputResultType, String>
+                        var outputResultType = OutputResultType.Success
+                        aggregatedObjects.add(Triple(returnedObj.left!!, returnedObj.middle, returnedObj.right!!))
 
-                /*if (returnedObj.right.contains("Exception")) {
-                    outputResultType = OutputResultType.RuntimeError
-                }*/
+                        /*if (returnedObj.right.contains("Exception")) {
+                            outputResultType = OutputResultType.RuntimeError
+                        }*/
+                    }
+                    catch (se: Exception) {
+                        val rootCause = ExceptionUtils.getRootCause(se)
+                        // Always a SecurityException (hopefully!) if we land here; there is an error handler elsewhere
+                        aggregatedObjects.add(Triple(Object(), OutputResultType.SecurityError, rootCause.toString()))
+                    }
+                }
+            })
+
+            try {
+                future.get(timeout as Long, TimeUnit.SECONDS) // Don't need to return anything
             }
-            catch (se: Exception) {
-                val rootCause = ExceptionUtils.getRootCause(se)
-                // Always a SecurityException (hopefully!) if we land here; there is an error handler elsewhere
-                aggregatedObjects.add(Triple(Object(), OutputResultType.SecurityError, rootCause.toString()))
+            catch (te: TimeoutException) {
+                future.cancel(true)
+                aggregatedObjects.add(Triple(Object(), OutputResultType.TimeoutError, te.toString()))
             }
         }
 

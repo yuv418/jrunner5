@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0creqres.proto\"_\n\x07Request\x12\x13\n\x0binputMethod\x18\x01 \x02(\t\x12\x17\n\x0finputMethodName\x18\x02 \x02(\t\x12\x16\n\x0esolutionMethod\x18\x03 \x02(\t\x12\x0e\n\x06inputs\x18\x04 \x03(\t\"\x89\x01\n\x08Response\x12\x32\n\x11overallResultType\x18\x01 \x02(\x0e\x32\x17.Response.RunResultType\x12\x18\n\x07results\x18\x02 \x03(\x0b\x32\x07.Output\"/\n\rRunResultType\x12\x0b\n\x07Success\x10\x00\x12\x11\n\rCompilerError\x10\x01\"\xa1\x01\n\x06Output\x12\x16\n\x0esolutionOutput\x18\x01 \x02(\t\x12-\n\x12solutionOutputType\x18\x02 \x02(\x0e\x32\x11.OutputResultType\x12\x14\n\x0cmethodOutput\x18\x03 \x02(\t\x12+\n\x10methodOutputType\x18\x04 \x02(\x0e\x32\x11.OutputResultType\x12\r\n\x05match\x18\x05 \x02(\x08*W\n\x10OutputResultType\x12\x0b\n\x07Success\x10\x00\x12\x10\n\x0cRuntimeError\x10\x01\x12\x11\n\rSecurityError\x10\x02\x12\x11\n\rCompilerError\x10\x03'
+  serialized_pb=b'\n\x0creqres.proto\"p\n\x07Request\x12\x13\n\x0binputMethod\x18\x01 \x02(\t\x12\x17\n\x0finputMethodName\x18\x02 \x02(\t\x12\x16\n\x0esolutionMethod\x18\x03 \x02(\t\x12\x0e\n\x06inputs\x18\x04 \x03(\t\x12\x0f\n\x07timeout\x18\x05 \x01(\x03\"\x89\x01\n\x08Response\x12\x32\n\x11overallResultType\x18\x01 \x02(\x0e\x32\x17.Response.RunResultType\x12\x18\n\x07results\x18\x02 \x03(\x0b\x32\x07.Output\"/\n\rRunResultType\x12\x0b\n\x07Success\x10\x00\x12\x11\n\rCompilerError\x10\x01\"\xa1\x01\n\x06Output\x12\x16\n\x0esolutionOutput\x18\x01 \x02(\t\x12-\n\x12solutionOutputType\x18\x02 \x02(\x0e\x32\x11.OutputResultType\x12\x14\n\x0cmethodOutput\x18\x03 \x02(\t\x12+\n\x10methodOutputType\x18\x04 \x02(\x0e\x32\x11.OutputResultType\x12\r\n\x05match\x18\x05 \x02(\x08*i\n\x10OutputResultType\x12\x0b\n\x07Success\x10\x00\x12\x10\n\x0cRuntimeError\x10\x01\x12\x11\n\rSecurityError\x10\x02\x12\x11\n\rCompilerError\x10\x03\x12\x10\n\x0cTimeoutError\x10\x04'
 )
 
 _OUTPUTRESULTTYPE = _descriptor.EnumDescriptor(
@@ -50,11 +50,16 @@ _OUTPUTRESULTTYPE = _descriptor.EnumDescriptor(
       serialized_options=None,
       type=None,
       create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='TimeoutError', index=4, number=4,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=417,
-  serialized_end=504,
+  serialized_start=434,
+  serialized_end=539,
 )
 _sym_db.RegisterEnumDescriptor(_OUTPUTRESULTTYPE)
 
@@ -63,6 +68,7 @@ Success = 0
 RuntimeError = 1
 SecurityError = 2
 CompilerError = 3
+TimeoutError = 4
 
 
 _RESPONSE_RUNRESULTTYPE = _descriptor.EnumDescriptor(
@@ -85,8 +91,8 @@ _RESPONSE_RUNRESULTTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=204,
-  serialized_end=251,
+  serialized_start=221,
+  serialized_end=268,
 )
 _sym_db.RegisterEnumDescriptor(_RESPONSE_RUNRESULTTYPE)
 
@@ -127,6 +133,13 @@ _REQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='timeout', full_name='Request.timeout', index=4,
+      number=5, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -140,7 +153,7 @@ _REQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=16,
-  serialized_end=111,
+  serialized_end=128,
 )
 
 
@@ -179,8 +192,8 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=114,
-  serialized_end=251,
+  serialized_start=131,
+  serialized_end=268,
 )
 
 
@@ -239,8 +252,8 @@ _OUTPUT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=254,
-  serialized_end=415,
+  serialized_start=271,
+  serialized_end=432,
 )
 
 _RESPONSE.fields_by_name['overallResultType'].enum_type = _RESPONSE_RUNRESULTTYPE

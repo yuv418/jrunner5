@@ -12,11 +12,11 @@ enum class RunResultType {
 }
 
 enum class OutputResultType {
-    Success, RuntimeError, SecurityError, CompilerError
+    Success, RuntimeError, SecurityError, CompilerError, TimeoutError
 }
 
 @Serializable
-data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: ArrayList<String> = arrayListOf()) // Reflect the inputs into the input types
+data class Request(val inputMethod: String, val inputMethodName: String, val solutionMethod: String, val inputs: ArrayList<String> = arrayListOf(), val timeout: Long = 15) // Reflect the inputs into the input types
 
 @Serializable
 data class Output(val solutionOutput: String, val solutionOutputType: OutputResultType, val methodOutput: String, val methodOutputType: OutputResultType, val match: Boolean)
@@ -42,7 +42,7 @@ class JRunnerClientHandler() {
 
         var ans = reflectionUtil.evalProblemSolution(
             req.inputMethod, req.inputMethodName,
-            req.solutionMethod, req.inputs
+            req.solutionMethod, req.inputs, req.timeout
         )
 
         println("DEBUG: outputted answer is $ans")
