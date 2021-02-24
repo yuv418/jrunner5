@@ -55,5 +55,7 @@ class JRunnerClientHandler() {
         client.close()
 
         println("Closed connection.")
+
+        Thread.currentThread().interrupt()
     }
 }

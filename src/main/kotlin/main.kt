@@ -31,6 +31,7 @@ fun main(args: Array<String>) {
     while (true) {
         val client = server.accept()
         println("Found connection $client")
+        println("Thread count is ${Thread.getAllStackTraces().keys.size}")
 
         thread {
             handler.run(client)

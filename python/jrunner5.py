@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     inputMethod = """
     public int myMethod(int a){
-    return a / 0;
+    while (true) {}
     }
     """
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
      }
     """
 
-    response = client.send_java(inputMethod, inputMethodName, solutionMethod, ["1", "2"], timeout=2)
+    response = client.send_java(inputMethod, inputMethodName, solutionMethod, ["1", "2"], timeout=1)
 
     print(f"Server returned response\n{response}")
     print(f"TIME {time.time() - stt} seconds")

@@ -113,6 +113,7 @@ public class JavaWrappedClass {
 
         val problemOut = compileRunJava(problemJava, functionArgs, timeout)
         val solutionOut = compileRunJava(solutionJava, functionArgs, timeout)
+        println("$solutionOut")
 
         var runResultType = RunResultType.Success
         var outputs: ArrayList<Output> = arrayListOf()
@@ -191,8 +192,7 @@ public class JavaWrappedClass {
 
         val classInst: Any = ref.get()
         for (i in functionArgs.indices) {
-            var sRun = Executors.newFixedThreadPool(1)
-            var future = sRun.submit(object: Runnable {
+            var future = Thread(object: Runnable {
                 override fun run() {
                     try {
                         val returnedObj: JavaTriple<Any, OutputResultType, String> = on(classInst).call("runProblemInput$i").get() as JavaTriple<Any, OutputResultType, String>
@@ -206,17 +206,23 @@ public class JavaWrappedClass {
                     catch (se: Exception) {
                         val rootCause = ExceptionUtils.getRootCause(se)
                         // Always a SecurityException (hopefully!) if we land here; there is an error handler elsewhere
-                        aggregatedObjects.add(Triple(Object(), OutputResultType.SecurityError, rootCause.toString()))
+                        // Apparently you can't catch ThreadDeath, so...
+
+                        if (rootCause.toString() == "java.lang.ThreadDeath") {
+                            aggregatedObjects.add(Triple(Object(), OutputResultType.TimeoutError, "Timeout"))
+                        }
+                        else {
+                            aggregatedObjects.add(Triple(Object(), OutputResultType.SecurityError, rootCause.toString()))
+                        }
                     }
                 }
             })
 
-            try {
-                future.get(timeout as Long, TimeUnit.SECONDS) // Don't need to return anything
-            }
-            catch (te: TimeoutException) {
-                future.cancel(true)
-                aggregatedObjects.add(Triple(Object(), OutputResultType.TimeoutError, te.toString()))
+            future.start()
+            future.join(timeout * 1000)
+
+            if (future.isAlive()) { // If somehow someone ran an infinite loop, we can stop it like thia:w
+                future.stop() // sad
             }
         }
 
