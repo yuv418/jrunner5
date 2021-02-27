@@ -1,15 +1,15 @@
+import io.ktor.http.cio.websocket.*
 import tv.ramesh.JRunnerClientHandler
-import tv.ramesh.ReflectionUtil;
+import tv.ramesh.TCPServer
+import tv.ramesh.WSClient
 import java.security.AllPermission
 import java.security.BasicPermission
-import java.lang.RuntimePermission
 import java.security.Permission
-import java.util.*
-import java.net.*
-import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 
 
-fun main(args: Array<String>) {
+@ExperimentalWebSocketExtensionApi
+suspend fun main(args: Array<String>) {
 
     System.setSecurityManager(object : SecurityManager() {
         override fun checkPermission(perm: Permission) {
@@ -23,19 +23,21 @@ fun main(args: Array<String>) {
         }
     })
 
-    val port = 5791
-    val server = ServerSocket(port);
-    val handler = JRunnerClientHandler()
-    println("DEBUG: Starting TCP socket server on port $port")
+    var bindHost = System.getenv("JRUNNER5_BINDHOST") ?: printErrorExit("You must provide a valid host for JRunner5 to use/connect to.")
+    val bindPort = System.getenv("JRUNNER5_BINDPORT").toIntOrNull() ?: printErrorExit("You must provide a valid port for JRunner5 to use/connect to.")
+    var bindMode = System.getenv("JRUNNER5_BINDMODE")
 
-    while (true) {
-        val client = server.accept()
-        println("Found connection $client")
-        println("Thread count is ${Thread.getAllStackTraces().keys.size}")
-
-        thread {
-            handler.run(client)
-        }
+    when (bindMode) {
+        "ws" ->  WSClient(JRunnerClientHandler(), false).listen(bindHost, bindPort)
+        "wss" -> WSClient(JRunnerClientHandler(), true).listen(bindHost, bindPort)
+        "tcp" -> TCPServer(JRunnerClientHandler()).listen(bindHost, bindPort)
+        else -> printErrorExit("You must provide a valid mode for JRunner5 to start in.")
     }
+
 }
 
+fun <T> printErrorExit(msg: String): T {
+    System.out.println(msg)
+    exitProcess(1)
+
+}

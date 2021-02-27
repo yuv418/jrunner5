@@ -10,8 +10,9 @@ class JRunner5Client():
         self.client_ip = client_ip
         self.client_port = client_port
 
-    def send_java(self, input_method, input_method_name, solution_method, inputs, timeout=None):
+    def send_java(self, id, input_method, input_method_name, solution_method, inputs, timeout=None):
         req = reqres_pb2.Request()
+        req.id = id
         req.inputMethod = input_method
         req.inputMethodName = input_method_name
         req.solutionMethod = solution_method
@@ -45,7 +46,7 @@ if __name__ == "__main__":
 
     inputMethod = """
     public int myMethod(int a){
-    while (true) {}
+        return a /0;
     }
     """
 
@@ -57,7 +58,7 @@ if __name__ == "__main__":
      }
     """
 
-    response = client.send_java(inputMethod, inputMethodName, solutionMethod, ["1", "2"], timeout=1)
+    response = client.send_java("1", inputMethod, inputMethodName, solutionMethod, ["1", "2"], timeout=1)
 
     print(f"Server returned response\n{response}")
     print(f"TIME {time.time() - stt} seconds")

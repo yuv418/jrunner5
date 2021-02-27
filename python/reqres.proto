@@ -1,11 +1,12 @@
 syntax = "proto2";
 
 message Request {
-    required string inputMethod = 1;
-    required string inputMethodName = 2;
-    required string solutionMethod = 3;
-    repeated string inputs = 4;
-    optional int64  timeout = 5;
+    optional string id = 1;
+    optional string inputMethod = 2;
+    optional string inputMethodName = 3;
+    optional string solutionMethod = 4;
+    repeated string inputs = 5;
+    optional int64  timeout = 6;
 }
 
 message Response {
@@ -15,8 +16,9 @@ message Response {
         CompilerError = 1;
     }
 
-    required RunResultType overallResultType = 1;
-    repeated Output results = 2;
+    optional string id = 1;
+    required RunResultType overallResultType = 2;
+    repeated Output results = 3;
 
 }
 
@@ -29,8 +31,6 @@ enum OutputResultType {
 }
 
 message Output {
-
-
     required string solutionOutput = 1;
     required OutputResultType solutionOutputType = 2;
     required string methodOutput = 3;

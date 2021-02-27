@@ -35,7 +35,7 @@ class ReflectionUtil {
         return functionName
     }
 
-    fun evalProblemSolution(inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>?, timeout: Long): tv.ramesh.Response {
+    fun evalProblemSolution(id: String, inputFunction: String, inputFunctionName: String, solutionFunction: String, functionArgs: ArrayList<String>?, timeout: Long): tv.ramesh.Response {
         // val functionFindRegex = Regex("""(public \w+ )([a-z]\w*)(\s*\(.+\) \{)""") // Replace the solution so the input function can't just call solution() and cheat
         // val inputFunctionName = functionFindRegex.findAll(inputFunction).map { it.groupValues[2] }.joinToString()
 
@@ -111,6 +111,7 @@ public class JavaWrappedClass {
         // println("DEBUG! Compiled java code is \n$java")
 
 
+        println("In thread.")
         val problemOut = compileRunJava(problemJava, functionArgs, timeout)
         val solutionOut = compileRunJava(solutionJava, functionArgs, timeout)
         println("$solutionOut")
@@ -173,7 +174,7 @@ public class JavaWrappedClass {
         }
 
 
-        return Response(runResultType, outputs)
+        return Response(id, runResultType, outputs)
 
     }
 

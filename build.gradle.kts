@@ -22,6 +22,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.0.1")
     implementation("org.apache.commons:commons-lang3:3.11")
     implementation("com.github.adelnizamutdinov:kotlin-either:3.0.0")
+    implementation("io.ktor:ktor-client-websockets:1.5.1")
+    implementation("io.ktor:ktor-client-cio:1.5.1")
 }
 
 

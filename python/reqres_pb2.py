@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0creqres.proto\"p\n\x07Request\x12\x13\n\x0binputMethod\x18\x01 \x02(\t\x12\x17\n\x0finputMethodName\x18\x02 \x02(\t\x12\x16\n\x0esolutionMethod\x18\x03 \x02(\t\x12\x0e\n\x06inputs\x18\x04 \x03(\t\x12\x0f\n\x07timeout\x18\x05 \x01(\x03\"\x89\x01\n\x08Response\x12\x32\n\x11overallResultType\x18\x01 \x02(\x0e\x32\x17.Response.RunResultType\x12\x18\n\x07results\x18\x02 \x03(\x0b\x32\x07.Output\"/\n\rRunResultType\x12\x0b\n\x07Success\x10\x00\x12\x11\n\rCompilerError\x10\x01\"\xa1\x01\n\x06Output\x12\x16\n\x0esolutionOutput\x18\x01 \x02(\t\x12-\n\x12solutionOutputType\x18\x02 \x02(\x0e\x32\x11.OutputResultType\x12\x14\n\x0cmethodOutput\x18\x03 \x02(\t\x12+\n\x10methodOutputType\x18\x04 \x02(\x0e\x32\x11.OutputResultType\x12\r\n\x05match\x18\x05 \x02(\x08*i\n\x10OutputResultType\x12\x0b\n\x07Success\x10\x00\x12\x10\n\x0cRuntimeError\x10\x01\x12\x11\n\rSecurityError\x10\x02\x12\x11\n\rCompilerError\x10\x03\x12\x10\n\x0cTimeoutError\x10\x04'
+  serialized_pb=b'\n\x0creqres.proto\"|\n\x07Request\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0binputMethod\x18\x02 \x01(\t\x12\x17\n\x0finputMethodName\x18\x03 \x01(\t\x12\x16\n\x0esolutionMethod\x18\x04 \x01(\t\x12\x0e\n\x06inputs\x18\x05 \x03(\t\x12\x0f\n\x07timeout\x18\x06 \x01(\x03\"\x95\x01\n\x08Response\x12\n\n\x02id\x18\x01 \x01(\t\x12\x32\n\x11overallResultType\x18\x02 \x02(\x0e\x32\x17.Response.RunResultType\x12\x18\n\x07results\x18\x03 \x03(\x0b\x32\x07.Output\"/\n\rRunResultType\x12\x0b\n\x07Success\x10\x00\x12\x11\n\rCompilerError\x10\x01\"\xa1\x01\n\x06Output\x12\x16\n\x0esolutionOutput\x18\x01 \x02(\t\x12-\n\x12solutionOutputType\x18\x02 \x02(\x0e\x32\x11.OutputResultType\x12\x14\n\x0cmethodOutput\x18\x03 \x02(\t\x12+\n\x10methodOutputType\x18\x04 \x02(\x0e\x32\x11.OutputResultType\x12\r\n\x05match\x18\x05 \x02(\x08*i\n\x10OutputResultType\x12\x0b\n\x07Success\x10\x00\x12\x10\n\x0cRuntimeError\x10\x01\x12\x11\n\rSecurityError\x10\x02\x12\x11\n\rCompilerError\x10\x03\x12\x10\n\x0cTimeoutError\x10\x04'
 )
 
 _OUTPUTRESULTTYPE = _descriptor.EnumDescriptor(
@@ -58,8 +58,8 @@ _OUTPUTRESULTTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=434,
-  serialized_end=539,
+  serialized_start=458,
+  serialized_end=563,
 )
 _sym_db.RegisterEnumDescriptor(_OUTPUTRESULTTYPE)
 
@@ -91,8 +91,8 @@ _RESPONSE_RUNRESULTTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=221,
-  serialized_end=268,
+  serialized_start=245,
+  serialized_end=292,
 )
 _sym_db.RegisterEnumDescriptor(_RESPONSE_RUNRESULTTYPE)
 
@@ -106,36 +106,43 @@ _REQUEST = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='inputMethod', full_name='Request.inputMethod', index=0,
-      number=1, type=9, cpp_type=9, label=2,
+      name='id', full_name='Request.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='inputMethodName', full_name='Request.inputMethodName', index=1,
-      number=2, type=9, cpp_type=9, label=2,
+      name='inputMethod', full_name='Request.inputMethod', index=1,
+      number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='solutionMethod', full_name='Request.solutionMethod', index=2,
-      number=3, type=9, cpp_type=9, label=2,
+      name='inputMethodName', full_name='Request.inputMethodName', index=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='inputs', full_name='Request.inputs', index=3,
-      number=4, type=9, cpp_type=9, label=3,
+      name='solutionMethod', full_name='Request.solutionMethod', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='inputs', full_name='Request.inputs', index=4,
+      number=5, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='timeout', full_name='Request.timeout', index=4,
-      number=5, type=3, cpp_type=2, label=1,
+      name='timeout', full_name='Request.timeout', index=5,
+      number=6, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -153,7 +160,7 @@ _REQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=16,
-  serialized_end=128,
+  serialized_end=140,
 )
 
 
@@ -166,15 +173,22 @@ _RESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='overallResultType', full_name='Response.overallResultType', index=0,
-      number=1, type=14, cpp_type=8, label=2,
+      name='id', full_name='Response.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='overallResultType', full_name='Response.overallResultType', index=1,
+      number=2, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='results', full_name='Response.results', index=1,
-      number=2, type=11, cpp_type=10, label=3,
+      name='results', full_name='Response.results', index=2,
+      number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -192,8 +206,8 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=131,
-  serialized_end=268,
+  serialized_start=143,
+  serialized_end=292,
 )
 
 
@@ -252,8 +266,8 @@ _OUTPUT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=271,
-  serialized_end=432,
+  serialized_start=295,
+  serialized_end=456,
 )
 
 _RESPONSE.fields_by_name['overallResultType'].enum_type = _RESPONSE_RUNRESULTTYPE
