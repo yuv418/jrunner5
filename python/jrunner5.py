@@ -52,6 +52,7 @@ class JRunner5Client():
             # Websocket send
             stt = time.time()
             await self.ws.send(req_bytes)
+            # In an actual client you'd ideally have this in a separate function where it hands off the incoming responses based on the IDs of the responses.
             async for data in self.ws:
                 response = reqres_pb2.Response()
                 response.ParseFromString(data)
@@ -91,7 +92,7 @@ if __name__ == "__main__":
         if sys.argv[1] == 'ws':
             client = JRunner5Client("127.0.0.1", 5791, True)
             srv = websockets.serve(client.ws_connect, "localhost", 5791)
-            asyncio.get_event_loop().run_until_complete(srv)
+            asyncio.get_event_loop().run_until_complete(srv) # *yawn repeated code
             asyncio.get_event_loop().run_forever()
     else:
         client = JRunner5Client("127.0.0.1", 5791, True)

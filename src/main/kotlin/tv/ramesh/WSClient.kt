@@ -19,12 +19,12 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
 
         val client = HttpClient {
             install(WebSockets) {
-                extensions {
+                /*extensions {
                     install(WebSocketDeflateExtension) {
-                        compressionLevel = Deflater.DEFAULT_COMPRESSION
-                        compressIfBiggerThan(bytes = 4 * 1024)
+                        // compressionLevel = Deflater.DEFAULT_COMPRESSION
+                        // compressIfBiggerThan(bytes = 4 * 1024)
                     }
-                }
+                }*/
             }
         }
 
@@ -33,7 +33,7 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
             method = HttpMethod.Get,
             host = host,
             port = port,
-            path = "/frame",
+            path = "/ecws/runner",
             request = {
                 url.protocol = if (wss) URLProtocol.WSS else URLProtocol.WS
                 url.port = port
@@ -41,9 +41,9 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
                 request() {}
             },
         ) {
-                while (true) {
-                    val frame = incoming.receive()
+            while (true) {
 
+                for (frame in incoming) {
 
                     GlobalScope.launch {
                         when (frame) {
@@ -52,11 +52,13 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
                                 val ansBytes = handler.handle(data)
 
                                 send(Frame.Binary(true, ByteBuffer.wrap(ansBytes)))
+
                             }
                             else -> {}
                         }
                     }
                 }
+            }
 
             }
     }

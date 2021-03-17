@@ -31,7 +31,6 @@ class JRunnerClientHandler() {
         val req = ProtoBuf.decodeFromByteArray<Request>(data)
         val reflectionUtil = ReflectionUtil()
 
-
         var ans = reflectionUtil.evalProblemSolution(
             req.id, req.inputMethod, req.inputMethodName,
             req.solutionMethod, req.inputs, req.timeout
@@ -42,8 +41,5 @@ class JRunnerClientHandler() {
         println("DEBUG: ans size is ${ansBytes.size}")
 
         return ansBytes
-
-
-
     }
 }
