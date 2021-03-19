@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.zip.Deflater
@@ -19,12 +20,12 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
 
         val client = HttpClient {
             install(WebSockets) {
-                /*extensions {
+                extensions {
                     install(WebSocketDeflateExtension) {
-                        // compressionLevel = Deflater.DEFAULT_COMPRESSION
-                        // compressIfBiggerThan(bytes = 4 * 1024)
+                         compressionLevel = Deflater.DEFAULT_COMPRESSION
+                         compressIfBiggerThan(bytes = 4 * 1024)
                     }
-                }*/
+                }
             }
         }
 
@@ -43,7 +44,7 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
         ) {
             while (true) {
 
-                for (frame in incoming) {
+                var frame = incoming.receive();
 
                     GlobalScope.launch {
                         when (frame) {
@@ -57,7 +58,6 @@ class WSClient(override val handler: JRunnerClientHandler, val wss: Boolean = fa
                             else -> {}
                         }
                     }
-                }
             }
 
             }
