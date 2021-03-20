@@ -24,6 +24,7 @@ dependencies {
     implementation("com.github.adelnizamutdinov:kotlin-either:3.0.0")
     implementation("io.ktor:ktor-client-websockets:1.5.1")
     implementation("io.ktor:ktor-client-cio:1.5.1")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.2.2")
 }
 
 
